@@ -4,8 +4,20 @@ const btn = document.querySelector(".btn-country");
 const countriesContainer = document.querySelector(".countries");
 
 // https://restcountries.com/v2/name/portugal
+// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
 
 ///////////////////////////////////////
+function errorHandler(err) {
+  countriesContainer.insertAdjacentText("beforeend", err);
+}
+
+function getJSON(url, errorMsg = "Something went wrong") {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+}
+
 function renderCountry(data, neighbour = "") {
   const html = `
     <article class="country ${neighbour}">
@@ -20,7 +32,6 @@ function renderCountry(data, neighbour = "") {
     </article>`;
 
   countriesContainer.insertAdjacentHTML("beforeend", html);
-  countriesContainer.style.opacity = 1;
 }
 
 function displayCountry(country) {
@@ -44,6 +55,34 @@ function displayCountry(country) {
     });
   });
 }
-displayCountry("pakistan");
+// displayCountry("pakistan");
 // displayCountry("portugal");
 // displayCountry("usa");
+
+function displayUsingPromises(country) {
+  getJSON(`https://restcountries.com/v2/name/${country}`, `Country not found`)
+    .then((data) => {
+      renderCountry(data[0]);
+
+      const neighbour = data[0].borders?.[0];
+
+      if (!neighbour) throw new Error("No neighbour of this country!");
+
+      return getJSON(
+        `https://restcountries.com/v2/alpha/${neighbour}`,
+        `Country not found`,
+      );
+    })
+    .then((data) => renderCountry(data, "neighbour"))
+    .catch((err) => {
+      errorHandler(`${err.message} Try again!`);
+    })
+    .finally(() => (countriesContainer.style.opacity = 1));
+}
+
+let isClicked = false;
+btn.addEventListener("click", function () {
+  if (isClicked) return; // Exit if already clicked
+  isClicked = true;
+  displayUsingPromises("australia");
+});
