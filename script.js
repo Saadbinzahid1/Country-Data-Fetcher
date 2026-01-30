@@ -34,27 +34,27 @@ function renderCountry(data, neighbour = "") {
   countriesContainer.insertAdjacentHTML("beforeend", html);
 }
 
-function displayCountry(country) {
-  const request = new XMLHttpRequest();
-  request.open("GET", `https://restcountries.com/v2/name/${country}`);
-  request.send();
-  request.addEventListener("load", function () {
-    const [data] = JSON.parse(this.responseText);
-    renderCountry(data);
+// function displayCountry(country) {
+//   const request = new XMLHttpRequest();
+//   request.open("GET", `https://restcountries.com/v2/name/${country}`);
+//   request.send();
+//   request.addEventListener("load", function () {
+//     const [data] = JSON.parse(this.responseText);
+//     renderCountry(data);
 
-    //Calling for the neighbours
-    const neighbours = [...data.borders];
-    neighbours.forEach((country) => {
-      const request2 = new XMLHttpRequest();
-      request2.open("GET", `https://restcountries.com/v2/alpha/${country}`);
-      request2.send();
-      request2.addEventListener("load", function () {
-        const data = JSON.parse(this.responseText);
-        renderCountry(data, "neighbour");
-      });
-    });
-  });
-}
+//     //Calling for the neighbours
+//     const neighbours = [...data.borders];
+//     neighbours.forEach((country) => {
+//       const request2 = new XMLHttpRequest();
+//       request2.open("GET", `https://restcountries.com/v2/alpha/${country}`);
+//       request2.send();
+//       request2.addEventListener("load", function () {
+//         const data = JSON.parse(this.responseText);
+//         renderCountry(data, "neighbour");
+//       });
+//     });
+//   });
+// }
 // displayCountry("pakistan");
 // displayCountry("portugal");
 // displayCountry("usa");
@@ -86,3 +86,21 @@ btn.addEventListener("click", function () {
   isClicked = true;
   displayUsingPromises("australia");
 });
+
+function coordsToLocation(lat, lng) {
+  fetch(
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`,
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(`Coordinates are of ${data.city}, ${data.countryName}`);
+      displayUsingPromises(`${data.countryName}`.toLowerCase());
+    })
+    .catch((error) => {
+      console.log(`Problem getting the location ${error.message}`);
+    });
+}
+
+coordsToLocation(52.508, 13.381);
+// coordsToLocation(19.037, 72.873);
+// coordsToLocation(-33.933, 18.474);
