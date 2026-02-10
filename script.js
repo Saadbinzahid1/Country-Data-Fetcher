@@ -101,6 +101,6 @@ function coordsToLocation(lat, lng) {
     });
 }
 
-coordsToLocation(52.508, 13.381);
+// coordsToLocation(52.508, 13.381);
 // coordsToLocation(19.037, 72.873);
 // coordsToLocation(-33.933, 18.474);
